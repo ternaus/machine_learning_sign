@@ -2,10 +2,12 @@
 from __future__ import division
 __author__ = 'Vladimir Iglovikov'
 
+# from pylab import *
 import pandas as pd
 import os
 import sqlite3
 import math
+import seaborn as sns
 
 #read data into the dataframe
 
@@ -19,15 +21,18 @@ df = df[df["avg_sign_value"] >= 0.1]
 
 #Now I want to keep only rows, where number_of_sites is equal to 16, 36, 64, 100
 
-df = df[(df["number_of_sites"] == 16) | (df["number_of_sites"] == 36) | (df["number_of_sites"] == 64) | (df["number_of_sites"] == 100)]
+N = 16
+u = 4
+beta = 4
 
-result = df[["total_energy_value", "number_of_sites", "beta", "mu_up", "u"]]
+df = df[(df["number_of_sites"] == N) & (df["u"] == u) & (df["beta"] == beta)]
+
+
 
 # It should not really matter right now, but later, when I will add results of the exact diagonalization
 # I will not be able to use beta infinity, thus I will creat column that will correspond to a column
-result["temperature"] = 1 / result["beta"]
+df["temperature"] = 1 / df["beta"]
 
-result.drop("beta", 1)
+df = df.sort('mu_up')
 
-result.to_csv("cleaned_data.csv")
-
+sns.tsplot(df["mu_up"], df["total_energy_value"])
